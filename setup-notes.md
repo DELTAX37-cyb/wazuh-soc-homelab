@@ -33,3 +33,52 @@ Updated the system:
 
 bash
 "sudo apt update && sudo apt upgrade -y"
+
+## 1.4 Deploying Wazuh SIEM Platform
+
+Successfully deployed the Wazuh 4.11 all-in-one stack on Ubuntu Server 22.04.5 LTS using the official automated installer.
+
+### Components Installed
+- Wazuh Manager
+- Wazuh Indexer
+- Wazuh Dashboard
+- Filebeat
+
+### Deployment Method
+Installed using the official Wazuh installation script:
+
+```bash
+curl -sO https://packages.wazuh.com/4.11/wazuh-install.sh
+chmod +x wazuh-install.sh
+sudo ./wazuh-install.sh -a
+
+## Validation Checks
+
+Verified:
+
+Wazuh manager service operational
+Dashboard service accessible
+Indexer service functioning correctly
+Remote SSH administration working through VS Code Remote-SSH
+## Dashboard Access
+
+Dashboard URL:
+
+https://192.168.197.130
+
+Successfully authenticated to the Wazuh web interface using the generated admin credentials.
+Browser displayed a self-signed certificate warning, which is expected in a homelab environment.
+VS Code Remote-SSH was configured successfully for remote administration and Git operations directly from the Ubuntu server.
+Initial dashboard confirmed successful deployment with active alert ingestion and system monitoring enabled.
+##Outcome
+
+The SOC homelab now has a fully operational SIEM platform capable of:
+
+~centralized log collection
+~threat detection
+~endpoint monitoring
+~alert investigation
+~security event visualization
+
+## Next phase:
+Deploy Windows agents and integrate Sysmon telemetry for endpoint detection and attack simulation.
