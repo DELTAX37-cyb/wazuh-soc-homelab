@@ -70,7 +70,7 @@ Successfully authenticated to the Wazuh web interface using the generated admin 
 Browser displayed a self-signed certificate warning, which is expected in a homelab environment.
 VS Code Remote-SSH was configured successfully for remote administration and Git operations directly from the Ubuntu server.
 Initial dashboard confirmed successful deployment with active alert ingestion and system monitoring enabled.
-##Outcome
+## Outcome
 
 The SOC homelab now has a fully operational SIEM platform capable of:
 
@@ -82,3 +82,133 @@ The SOC homelab now has a fully operational SIEM platform capable of:
 
 ## Next phase:
 Deploy Windows agents and integrate Sysmon telemetry for endpoint detection and attack simulation.
+
+## 1.5 Windows Agent Enrollment
+
+### Objective
+
+Connect a Windows 11 endpoint to the Wazuh SIEM platform for centralized endpoint monitoring and telemetry collection.
+
+---
+
+### Actions Performed
+
+#### Verified Wazuh Manager Services
+
+Validated that the Wazuh manager and agent authentication services were operational on the Ubuntu server.
+
+Commands used:
+
+```bash
+sudo systemctl status wazuh-manager
+sudo ss -tulpn | grep 1514
+sudo ss -tulpn | grep 1515
+```
+
+Verified:
+- Port 1514 open for agent communication
+- Port 1515 open for agent enrollment/authentication
+
+---
+
+#### Installed Windows Wazuh Agent
+
+Installed the Wazuh Windows agent on the Windows 11 endpoint system.
+
+Agent version:
+- Wazuh Agent v4.11.0
+
+---
+
+#### Agent Enrollment
+
+Registered the Windows endpoint with the Wazuh manager using agent-auth.
+
+Command executed from Administrator PowerShell:
+
+```powershell
+& "C:\Program Files (x86)\ossec-agent\agent-auth.exe" -m 192.168.197.130 -A WIN11-ENDPOINT-2
+```
+
+Successfully received a valid authentication key from the Wazuh manager.
+
+---
+
+### Troubleshooting Performed
+
+#### Issue 1 — Duplicate Agent Name
+
+Initial enrollment failed due to an existing agent entry already registered on the manager.
+
+Resolution:
+- Renamed the endpoint to:
+  - WIN11-ENDPOINT-2
+
+---
+
+#### Issue 2 — Wazuh Service Would Not Start
+
+The Windows Wazuh agent service repeatedly failed after enrollment.
+
+Log analysis revealed:
+
+```text
+ERROR: Invalid server address found: '0.0.0.0'
+ERROR: No client configured. Exiting.
+```
+
+Cause:
+- Incorrect manager IP configured inside:
+  - ossec.conf
+
+Resolution:
+- Updated manager address from:
+  - 0.0.0.0
+- To:
+  - 192.168.197.130
+
+Configuration file updated:
+
+```text
+C:\Program Files (x86)\ossec-agent\ossec.conf
+```
+
+---
+
+### Validation
+
+Successfully verified:
+
+- Wazuh agent service running
+- Endpoint visible in Wazuh dashboard
+- Agent status marked as active
+- Windows OS details populated correctly
+- Endpoint IP address detected
+- Telemetry successfully reaching the SIEM server
+
+PowerShell validation command:
+
+```powershell
+Get-Service WazuhSvc
+```
+
+Result:
+
+```text
+Running  WazuhSvc
+```
+
+---
+
+### Outcome
+
+The SOC homelab now includes an actively monitored Windows 11 endpoint connected to the Wazuh SIEM platform.
+
+Current capabilities include:
+
+- Centralized endpoint monitoring
+- Windows telemetry collection
+- Agent-based log forwarding
+- Endpoint inventory visibility
+- Real-time SIEM ingestion
+- Foundation for Sysmon integration and threat detection workflows
